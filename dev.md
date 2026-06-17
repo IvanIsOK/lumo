@@ -6,77 +6,126 @@ It compiles to native executables using a C-based compiler.
 
 ---
 
-# 📦 File Extension
+## 📦 File Extension
 
-
+```
 .lumo
-
+```
 
 Example:
 
+```
 main.lumo
 math.lumo
 utils.lumo
-
+```
 
 ---
 
-# ⚙️ Build System
+## ⚙️ Build System
 
 Lumo uses a single compiler:
 
-
+```
 compiler.c → lumo compiler
-
+```
 
 Compiled with:
 
 ```bash
 gcc compiler.c -o lumo
-🚀 Running a program
+```
+
+---
+
+## 🚀 Running a Program
+
+```bash
 ./lumo main.lumo
+```
 
 This will:
 
-preprocess includes
-compile Lumo → C
-run GCC automatically
-output executable program
-📂 Example Project Structure
+- preprocess includes  
+- compile Lumo → C  
+- run GCC automatically  
+- output executable program  
+
+---
+
+## 📂 Example Project Structure
+
+```
 project/
  ├── compiler.c
  ├── main.lumo
  ├── math.lumo
  ├── utils.lumo
  └── dev.md
-📌 Language Syntax
-Variables
+```
+
+---
+
+## 📌 Language Syntax
+
+### Variables
+
+```
 let x = 10;
-Print
+```
+
+### Print
+
+```
 print x;
-If
+```
+
+### If
+
+```
 if x < 10 {
     print x;
 }
-While
+```
+
+### While
+
+```
 while x > 0 {
     x = x - 1;
 }
-📥 Includes
+```
+
+---
+
+## 📥 Includes
 
 Lumo supports file includes:
 
+```
 #include "math.lumo"
 #include "utils.lumo"
-Behavior:
-Includes are processed BEFORE compilation
-Files are merged into one compilation unit
-Works like C includes (but simpler)
-⚠️ Notes
-Circular includes are not yet prevented
-Includes are textual (not module-based yet)
-No separate compilation units yet
-🧠 Compiler Pipeline
+```
+
+### Behavior
+
+- Includes are processed BEFORE compilation  
+- Files are merged into one compilation unit  
+- Works like C includes (but simpler)  
+
+---
+
+## ⚠️ Notes
+
+- Circular includes are not yet prevented  
+- Includes are textual (not module-based yet)  
+- No separate compilation units yet  
+
+---
+
+## 🧠 Compiler Pipeline
+
+```
 .lumo source
     ↓
 preprocessor (#include)
@@ -88,3 +137,4 @@ C generator
 gcc
     ↓
 binary (program)
+```
