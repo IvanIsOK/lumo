@@ -1,36 +1,40 @@
-# 🌱 Lumo Language
+# 🌱 Lumo v2 — Developer Documentation
 
-Lumo is a lightweight compiled programming language designed to be simple, fast, and extensible.
+Lumo v2 is a **real compiled programming language** written in C.
 
-It compiles to native executables using a C-based compiler.
+It compiles directly to **x86_64 assembly**, then to a native executable.
 
 ---
 
-## 📦 File Extension
+# ⚙️ Compilation Pipeline
+
+```
+.lumo source
+    ↓
+lexer (C)
+    ↓
+parser (minimal AST)
+    ↓
+assembly generator
+    ↓
+nasm
+    ↓
+ld
+    ↓
+native executable
+```
+
+---
+
+# 📦 File Extension
 
 ```
 .lumo
 ```
 
-Example:
-
-```
-main.lumo
-math.lumo
-utils.lumo
-```
-
 ---
 
-## ⚙️ Build System
-
-Lumo uses a single compiler:
-
-```
-compiler.c → lumo compiler
-```
-
-Compiled with:
+# 🚀 How to Build Compiler
 
 ```bash
 gcc compiler.c -o lumo
@@ -38,103 +42,108 @@ gcc compiler.c -o lumo
 
 ---
 
-## 🚀 Running a Program
+# 🚀 How to Compile a Program
 
 ```bash
 ./lumo main.lumo
 ```
 
-This will:
-
-- preprocess includes  
-- compile Lumo → C  
-- run GCC automatically  
-- output executable program  
-
----
-
-## 📂 Example Project Structure
+This produces:
 
 ```
-project/
- ├── compiler.c
- ├── main.lumo
- ├── math.lumo
- ├── utils.lumo
- └── dev.md
+program
 ```
 
 ---
 
-## 📌 Language Syntax
+# ▶️ Run Program
 
-### Variables
-
+```bash
+./program
 ```
+
+---
+
+# 📌 Language Syntax (v2)
+
+## Variables
+
+```lumo
 let x = 10;
 ```
 
-### Print
+Only one variable currently exists:
 
 ```
+x
+```
+
+---
+
+## Print
+
+```lumo
 print x;
 ```
 
-### If
+---
+
+# ⚠️ Current Limitations (v2)
+
+Lumo v2 is early-stage:
+
+- Only supports integer variable `x`
+- No expressions (`x + y` not supported yet)
+- No functions
+- No if/while
+- Print is raw syscall-based
+- Very minimal parser
+
+---
+
+# 🧠 Internal Design
+
+## Lexer
+Converts text → tokens:
+- let
+- print
+- numbers
+- identifiers
+
+## Code Generator
+Directly emits x86_64 assembly:
 
 ```
-if x < 10 {
-    print x;
-}
-```
-
-### While
-
-```
-while x > 0 {
-    x = x - 1;
-}
+mov qword [x], 10
 ```
 
 ---
 
-## 📥 Includes
+# 🔮 Roadmap
 
-Lumo supports file includes:
+### v3
+- multiple variables
+- expressions
+- stack memory
 
-```
-#include "math.lumo"
-#include "utils.lumo"
-```
+### v4
+- if / while
+- functions
 
-### Behavior
+### v5
+- proper type system
+- strings
 
-- Includes are processed BEFORE compilation  
-- Files are merged into one compilation unit  
-- Works like C includes (but simpler)  
-
----
-
-## ⚠️ Notes
-
-- Circular includes are not yet prevented  
-- Includes are textual (not module-based yet)  
-- No separate compilation units yet  
+### v6
+- full standard library
 
 ---
 
-## 🧠 Compiler Pipeline
+# 💡 Design Philosophy
 
-```
-.lumo source
-    ↓
-preprocessor (#include)
-    ↓
-merged source
-    ↓
-C generator
-    ↓
-gcc
-    ↓
-binary (program)
-```
+Lumo is built to be:
+
+- minimal
+- fast
+- easy to compile
+- close to hardware
