@@ -1,114 +1,160 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <ctype.h>
 
-#define MAX_SRC 100000
-#define MAX_FILE 512
+#define MAX 4096
 
-// ===== read file =====
-char* read_file(const char *path) {
-    FILE *f = fopen(path, "r");
-    if (!f) {
-        printf("Error: cannot open %s\n", path);
+// ================= TOKENS =================
+
+typedef enum {
+    T_LET, T_PRINT,
+    T_ID, T_NUM,
+    T_EQ,
+    T_SEMI,
+    T_EOF
+} TokenType;
+
+typedef struct {
+    TokenType type;
+    char text[64];
+} Token;
+
+Token tokens[MAX];
+int pos = 0;
+int tcount = 0;
+
+char *src;
+
+// ================= LEXER =================
+
+void add(TokenType t, char *txt) {
+    tokens[tcount].type = t;
+    if (txt) strcpy(tokens[tcount].text, txt);
+    else tokens[tcount].text[0] = 0;
+    tcount++;
+}
+
+void lex(char *s) {
+    src = s;
+
+    while (*src) {
+        if (isspace(*src)) { src++; continue; }
+
+        if (strncmp(src, "let", 3) == 0) {
+            add(T_LET, "let"); src += 3; continue;
+        }
+
+        if (strncmp(src, "print", 5) == 0) {
+            add(T_PRINT, "print"); src += 5; continue;
+        }
+
+        if (*src == '=') { add(T_EQ, "="); src++; continue; }
+        if (*src == ';') { add(T_SEMI, ";"); src++; continue; }
+
+        if (isdigit(*src)) {
+            char b[64]; int i = 0;
+            while (isdigit(*src)) b[i++] = *src++;
+            b[i] = 0;
+            add(T_NUM, b);
+            continue;
+        }
+
+        if (isalpha(*src)) {
+            char b[64]; int i = 0;
+            while (isalnum(*src)) b[i++] = *src++;
+            b[i] = 0;
+            add(T_ID, b);
+            continue;
+        }
+
+        printf("Lex error: %c\n", *src);
         exit(1);
     }
 
-    char *buf = malloc(MAX_SRC);
-    size_t len = fread(buf, 1, MAX_SRC - 1, f);
-    buf[len] = 0;
-
-    fclose(f);
-    return buf;
+    add(T_EOF, "");
 }
 
-// ===== handle includes =====
-void append_file(char *out, const char *file) {
-    char *content = read_file(file);
-    strcat(out, content);
-    free(content);
+// ================= CODEGEN (ASM) =================
+
+FILE *out;
+
+void emit(const char *s) {
+    fprintf(out, "%s\n", s);
 }
 
-// ===== preprocess (#include) =====
-void preprocess(char *input, char *output) {
-    char line[1024];
+// single variable model (x only for v2)
+void compile() {
+    emit("section .bss");
+    emit("x resq 1");
 
-    char *p = input;
-    while (*p) {
-        int i = 0;
+    emit("section .text");
+    emit("global _start");
 
-        while (*p && *p != '\n') {
-            line[i++] = *p++;
+    emit("_start:");
+
+    while (tokens[pos].type != T_EOF) {
+
+        // let x = num;
+        if (tokens[pos].type == T_LET) {
+            pos++; // let
+            pos++; // id (assume x)
+            pos++; // =
+
+            int value = atoi(tokens[pos].text);
+            pos++; // num
+
+            char buf[128];
+            sprintf(buf, "mov qword [x], %d", value);
+            emit(buf);
+
+            pos++; // ;
         }
-        line[i] = 0;
-        if (*p == '\n') p++;
 
-        // handle include
-        if (strncmp(line, "#include", 8) == 0) {
-            char filename[MAX_FILE];
-            sscanf(line, "#include \"%[^\"]\"", filename);
-            append_file(output, filename);
-        } else {
-            strcat(output, line);
-            strcat(output, "\n");
+        // print x;
+        else if (tokens[pos].type == T_PRINT) {
+            pos++;
+            pos++; // id
+            pos++; // ;
+
+            emit("; print x (syscall raw placeholder)");
+            emit("mov rax, 1");
+            emit("mov rdi, 1");
+            emit("mov rsi, x");
+            emit("mov rdx, 8");
+            emit("syscall");
         }
     }
+
+    emit("mov rax, 60");
+    emit("mov rdi, 0");
+    emit("syscall");
 }
 
-// ===== VERY simple backend (placeholder for real compiler pipeline) =====
-void compile_to_c(const char *src, FILE *out) {
-    fprintf(out, "#include <stdio.h>\n\n");
-    fprintf(out, "int main() {\n");
+// ================= MAIN =================
 
-    // NOTE:
-    // This is intentionally minimal.
-    // Real parser/AST will replace this later.
-
-    char buf[1024];
-    const char *p = src;
-
-    while (*p) {
-        if (sscanf(p, "%1023[^\n]\n", buf) == 1) {
-            p += strlen(buf) + 1;
-
-            // skip includes (already processed)
-            if (strncmp(buf, "#include", 8) == 0)
-                continue;
-
-            // naive passthrough (temporary stage)
-            fprintf(out, "    %s\n", buf);
-        } else break;
-    }
-
-    fprintf(out, "return 0;\n");
-    fprintf(out, "}\n");
-}
-
-// ===== MAIN =====
 int main(int argc, char **argv) {
     if (argc != 2) {
-        printf("Usage: lumo main.lumo\n");
+        printf("Usage: lumo file.lumo\n");
         return 1;
     }
 
-    char combined[MAX_SRC] = {0};
+    FILE *f = fopen(argv[1], "r");
+    if (!f) return 1;
 
-    char *src = read_file(argv[1]);
+    char buf[10000];
+    fread(buf, 1, sizeof(buf), f);
+    fclose(f);
 
-    preprocess(src, combined);
+    lex(buf);
 
-    FILE *out = fopen("out.c", "w");
-    if (!out) {
-        printf("Error writing output\n");
-        return 1;
-    }
-
-    compile_to_c(combined, out);
-
+    out = fopen("out.asm", "w");
+    compile();
     fclose(out);
-    free(src);
 
-    system("gcc out.c -o program");
+    system("nasm -f elf64 out.asm -o out.o");
+    system("ld out.o -o program");
 
-    printf("Built: program\n");
+    printf("Built program\n");
     return 0;
 }
