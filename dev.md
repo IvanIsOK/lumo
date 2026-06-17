@@ -1,6 +1,6 @@
-# 🌱 Lumo v2 — Developer Documentation
+# 🌱 Lumo — Developer Documentation
 
-Lumo v2 is a **real compiled programming language** written in C.
+Lumo is a **real compiled programming language** written in C.
 
 It compiles directly to **x86_64 assembly**, then to a native executable.
 
@@ -88,9 +88,9 @@ print x;
 
 ---
 
-# ⚠️ Current Limitations (v2)
+# ⚠️ Current Limitations
 
-Lumo v2 is early-stage:
+Lumo is early-stage:
 
 - Only supports integer variable `x`
 - No expressions (`x + y` not supported yet)
