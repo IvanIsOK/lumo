@@ -1,15 +1,14 @@
-fn add(a, b) {
-    return a + b;
-}
+let x = 2;
+print x;
 
-fn sub(a, b) {
-    return a - b;
-}
+let x = 4;
+print x;
 
-fn mul(a, b) {
-    return a * b;
-}
+let x = 8;
+print x;
 
-fn div(a, b) {
-    return a / b;
-}
+let x = 16;
+print x;
+
+let x = 32;
+print x;
