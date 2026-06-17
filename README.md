@@ -5,4 +5,7 @@ Lumo is a working real compiler, but it is still in an early-stage implementatio
 In practice, it successfully compiles .lumo programs into native executables using a C-based compiler written in C. The toolchain (lexer → code generator → assembler → linker) is functional and produces runnable programs.
 However, Lumo is not yet a fully featured programming language.
 If anyone is interested in expanding it please all pull requests are welcome!
+
 ### Lumo is inspired by C!
+
+Needs NASM to compile
