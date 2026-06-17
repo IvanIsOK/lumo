@@ -1,20 +1,17 @@
-fn max(a, b) {
-    if a > b {
-        return a;
-    }
-    return b;
-}
+let x = 1;
+print x;
 
-fn min(a, b) {
-    if a < b {
-        return a;
-    }
-    return b;
-}
+let x = 3;
+print x;
 
-fn abs(x) {
-    if x < 0 {
-        return 0 - x;
-    }
-    return x;
-}
+let x = 6;
+print x;
+
+let x = 9;
+print x;
+
+let x = 12;
+print x;
+
+let x = 15;
+print x;
