@@ -9,3 +9,5 @@ If anyone is interested in expanding it please all pull requests are welcome!
 ### Lumo is inspired by C!
 
 Needs NASM to compile
+
+Lumo had a older version i scrapped (thats why you can see himts about older lumo, (current v2), like "#for v2" in compiler.c
