@@ -1,2 +1,2 @@
 # lumo
-Lumo is a programming laungauge, i made with AI as a test.
+Lumo is a programming laungauge, i made with AI as a test. See dev.md for more info on it.
