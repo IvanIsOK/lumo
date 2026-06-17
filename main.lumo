@@ -1,20 +1,11 @@
-#include "math.lumo"
-#include "utils.lumo"
+let x = 10;
+print x;
 
-let a = 10;
-let b = 5;
+let y = 20;
+print y;
 
-let sum = add(a, b);
-let diff = sub(a, b);
+let x = 15;
+print x;
 
-print sum;
-print diff;
-
-let i = 3;
-
-while i > 0 {
-    print i;
-    let i = i - 1;
-}
-
-print 0;
+let y = 5;
+print y;
